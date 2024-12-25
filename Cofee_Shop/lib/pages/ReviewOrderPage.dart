@@ -1,6 +1,8 @@
 import 'package:cofee_shop/components/CustomBottomNavigatorButton.dart';
 import 'package:cofee_shop/components/ReviewOrderCard.dart';
 import 'package:cofee_shop/config/Colors.dart';
+import 'package:cofee_shop/controller/AdressController.dart';
+import 'package:cofee_shop/pages/MapPage.dart';
 import 'package:cofee_shop/pages/PaymentMethod.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -39,11 +41,11 @@ class ReviewOrderPage extends StatelessWidget {
 
     final double appBarTitleFontSize = (28 * widthScale).clamp(20, 32).toDouble();
     final double titleFontSize = (18 * widthScale).clamp(14, 24).toDouble();
-    final double addressFontSize = (14 * widthScale).clamp(12, 18).toDouble();
+    // final double addressFontSize = (14 * widthScale).clamp(12, 18).toDouble();
     final double paddingHorizontal = (35.0 * widthScale).clamp(20, 50).toDouble();
     final double verticalSpacing = (16.0 * heightScale).clamp(12, 24).toDouble();
     final double totalSpacing = (56.0 * heightScale).clamp(40, 70).toDouble();
-
+    final AddressController addressController = Get.put(AddressController());
     final RxDouble totalPrice = price.obs; // Reactive variable for total price
 
     return Scaffold(
@@ -134,31 +136,40 @@ class ReviewOrderPage extends StatelessWidget {
                   ),
                   SizedBox(height: verticalSpacing),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Address ',
-                        style: TextStyle(
-                          fontSize: addressFontSize,
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Expanded(
-                        child: Text(
-                          '23/6 A New York USA',
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Address ',
                           style: TextStyle(
-                            fontSize: addressFontSize,
+                            fontSize: titleFontSize,
                             fontFamily: 'Inter',
-                            fontWeight: FontWeight.w500,
+                            fontWeight: FontWeight.bold,
                           ),
-                          textAlign: TextAlign.end,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
                         ),
-                      ),
-                    ],
-                  ),
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () async {
+                              // Navigate to the MapPage and get the result
+                              final result = await Get.to(() => const MapPage());
+                              if (result != null) {
+                                // Update the address in the controller
+                                addressController.updateAddress(result);
+                              }
+                            },
+                            child: Obx(() => Text(
+                              addressController.address.value,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              textAlign: TextAlign.end,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            )),
+                          ),
+                        ),
+                      ],
+                    ),
                 ],
               ),
             ),

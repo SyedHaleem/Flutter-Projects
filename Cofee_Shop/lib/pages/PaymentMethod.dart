@@ -36,7 +36,7 @@ class PaymentMethod extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new, size: scale(20), color: Colors.brown),
+          icon: Icon(Icons.arrow_back_ios_new, size: scale(20), color: CofeeBox),
           onPressed: () => Get.back(),
         ),
         titleSpacing: scale(40),

@@ -40,6 +40,15 @@ dependencies:
   google_nav_bar: ^5.0.7
   font_awesome_flutter: ^10.8.0
   confetti: ^0.8.0
+  google_maps_flutter: ^2.10.0
+  location: ^7.0.1
+  flutter_polyline_points: ^2.1.0
+  dio: ^5.7.0
+  http: ^1.2.2
+  type_ahead_text_field: ^0.0.5
+  flutter_typeahead: ^5.2.0
+  geocoding: ^3.0.0
+  geolocator: ^13.0.2
 
 dev_dependencies:
   flutter_test:
