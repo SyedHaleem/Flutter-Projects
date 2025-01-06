@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'package:cofee_shop/config/Colors.dart';
+import 'package:cofee_shop/consts/consts.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({super.key});
@@ -26,6 +28,7 @@ class _MapPageState extends State<MapPage> {
 
   Set<Polyline> polylines = {};
   List<Marker> markers = [];
+  List<LatLng> _polylineCoordinates = [];
 
   static const CameraPosition _initialCameraPosition = CameraPosition(
     target: LatLng(37.4223, -122.0848),
@@ -50,7 +53,6 @@ class _MapPageState extends State<MapPage> {
           onPressed: () async {
             if (_currentP != null) {
               try {
-                // Reverse geocode to get address
                 List<Placemark> placemarks = await placemarkFromCoordinates(
                   _currentP!.latitude,
                   _currentP!.longitude,
@@ -59,7 +61,6 @@ class _MapPageState extends State<MapPage> {
                   Placemark placemark = placemarks.first;
                   String address =
                       '${placemark.locality}, ${placemark.administrativeArea}, ${placemark.country}';
-                  // Pass the address back
                   Get.back(result: address);
                 } else {
                   Get.back(result: 'Unknown Location');
@@ -141,7 +142,7 @@ class _MapPageState extends State<MapPage> {
             ),
           ),
           Positioned(
-            top: 650, // Adjust as needed
+            top: 650,
             right: 7,
             child: SizedBox(
               width: 45,
@@ -150,7 +151,7 @@ class _MapPageState extends State<MapPage> {
                 onPressed: () async {
                   if (_disfromController.text.isNotEmpty &&
                       _distoController.text.isNotEmpty) {
-                    await _getLatLong();
+                    await _getLatLongAndPolyline();
                     _moveCameraToBounds();
                   } else if (_currentP != null) {
                     _moveCameraToPosition(_currentP!);
@@ -213,36 +214,54 @@ class _MapPageState extends State<MapPage> {
     });
   }
 
-  Future<void> _getLatLong() async {
+  Future<void> _getLatLongAndPolyline() async {
     try {
       List<Location> locationFrom =
       await locationFromAddress(_disfromController.text);
       List<Location> locationTo =
       await locationFromAddress(_distoController.text);
 
+      locfrom = LatLng(locationFrom[0].latitude, locationFrom[0].longitude);
+      locto = LatLng(locationTo[0].latitude, locationTo[0].longitude);
+
+      markers = [
+        Marker(
+          markerId: const MarkerId("FromLocation"),
+          position: locfrom,
+          infoWindow: const InfoWindow(title: "From Location"),
+        ),
+        Marker(
+          markerId: const MarkerId("ToLocation"),
+          position: locto,
+          infoWindow: const InfoWindow(title: "To Location"),
+        ),
+      ];
+
+      _polylineCoordinates.clear();
+      PolylinePoints polylinePoints = PolylinePoints();
+      PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
+          googleApiKey: GOOGLE_MAPS_API_KEY,
+          request: PolylineRequest(
+            origin: PointLatLng( locfrom.latitude, locfrom.longitude),
+            destination: PointLatLng(locto.latitude, locto.longitude),
+            mode: TravelMode.driving,
+      ));
+
+      if (result.points.isNotEmpty) {
+        for (var point in result.points) {
+          _polylineCoordinates.add(LatLng(point.latitude, point.longitude));
+        }
+      } else {
+        debugPrint("Error fetching polyline: ${result.errorMessage}");
+      }
+
       setState(() {
-        locfrom = LatLng(locationFrom[0].latitude, locationFrom[0].longitude);
-        locto = LatLng(locationTo[0].latitude, locationTo[0].longitude);
-
-        markers = [
-          Marker(
-            markerId: const MarkerId("FromLocation"),
-            position: locfrom,
-            infoWindow: const InfoWindow(title: "From Location"),
-          ),
-          Marker(
-            markerId: const MarkerId("ToLocation"),
-            position: locto,
-            infoWindow: const InfoWindow(title: "To Location"),
-          ),
-        ];
-
         polylines = {
           Polyline(
             polylineId: const PolylineId("route"),
-            color: Colors.blue,
-            width: 5,
-            points: [locfrom, locto],
+            color: CofeeText,
+            width: 4,
+            points: _polylineCoordinates,
           ),
         };
       });

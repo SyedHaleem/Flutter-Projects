@@ -2,13 +2,19 @@ import 'package:cofee_shop/components/CustomBottomNavigationBar.dart';
 import 'package:cofee_shop/components/CustomTabBar.dart';
 import 'package:cofee_shop/components/CustomTextField.dart';
 import 'package:cofee_shop/config/Colors.dart';
+import 'package:cofee_shop/pages/Launch.dart';
+import 'package:cofee_shop/pages/Login.dart';
+import 'package:cofee_shop/utils/utils.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class Home extends StatelessWidget {
   const Home({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final auth =FirebaseAuth.instance;
     TextEditingController searchController = TextEditingController();
 
     // Fetch screen dimensions
@@ -30,7 +36,14 @@ class Home extends StatelessWidget {
         actions: [
           Padding(
             padding: EdgeInsets.only(right: padding),
-            child: Image.asset('assets/images/profile_img.png'),
+            // child: Image.asset('assets/images/profile_img.png'),
+            child: IconButton(onPressed: (){
+              auth.signOut().then((value){
+                Get.to(Launch());
+              }).catchError((error) {
+                Utils().toastMessage(error.toString());
+              });
+            }, icon: Icon(Icons.logout,color: CofeeBox,)),
           ),
         ],
       ),

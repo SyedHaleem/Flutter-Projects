@@ -1,8 +1,11 @@
 import 'dart:math' as math;
 
 import 'package:cofee_shop/components/CustomTextField.dart';
+import 'package:cofee_shop/config/Colors.dart';
 import 'package:cofee_shop/pages/Home.dart';
 import 'package:cofee_shop/pages/Signup.dart';
+import 'package:cofee_shop/utils/utils.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -22,6 +25,8 @@ class Login extends StatelessWidget {
 
     double baseFontSize = screenWidth / 25; // Base font size proportional to screen width
     double subTextFontSize = math.max(screenWidth / 30, 14); // Minimum 14 for readability
+    final _auth = FirebaseAuth.instance;
+    final LoginController loginController = Get.put(LoginController());
 
     return Scaffold(
       body: Container(
@@ -41,15 +46,15 @@ class Login extends StatelessWidget {
                 child: Column(
                   children: [
                     Image.asset('assets/icons/bean_logo1.png'),
-                    SizedBox(height: screenHeight * 0.05), // Adjust gap between logo and text fields
+                    SizedBox(height: screenHeight * 0.05),
                     CustomTextField(
                       iconColor: Colors.black,
                       textColor: Colors.black,
                       bgColor: Colors.white70,
                       controller: uName,
-                      hintText: 'Username',
-                      icon: Icons.person,
-                      keyboardType: TextInputType.name,
+                      hintText: 'Email',
+                      icon: Icons.email,
+                      keyboardType: TextInputType.emailAddress,
                       width: textFieldWidth,
                     ),
                     SizedBox(height: screenHeight * 0.03), // Adjust gap between fields
@@ -84,27 +89,51 @@ class Login extends StatelessWidget {
                     Container(
                       width: buttonWidth,
                       height: 64,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Get.to(const Home());
-                        },
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 15),
-                          backgroundColor: Colors.white70,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15),
+                      child: Obx(() {
+                        return ElevatedButton(
+                          onPressed: loginController.isLoading.value
+                              ? null
+                              : () {
+                            loginController.toggleLoading(true);
+                            _auth
+                                .signInWithEmailAndPassword(
+                              email: uName.text.trim(),
+                              password: uPass.text.trim(),
+                            )
+                                .then((value) {
+                              Get.to(const Home());
+                            })
+                                .catchError((error) {
+                              Utils().toastMessage(error.toString());
+                            })
+                                .whenComplete(() {
+                              loginController.toggleLoading(false);
+                            });
+
+                          },
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 15),
+                            backgroundColor: Colors.white70,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15),
+                            ),
                           ),
-                        ),
-                        child: const Text(
-                          'Login',
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.black,
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.w500,
+                          child: loginController.isLoading.value
+                              ? const CircularProgressIndicator(
+                            strokeWidth: 3,
+                            color: CofeeBox,
+                          )
+                              : const Text(
+                            'Login',
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: Colors.black,
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
-                        ),
-                      ),
+                        );
+                      }),
                     ),
                     SizedBox(height: screenHeight * 0.08), // Adjust gap before sign-up prompt
                     Row(
@@ -144,5 +173,14 @@ class Login extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+
+class LoginController extends GetxController {
+  var isLoading = false.obs;
+
+  void toggleLoading(bool value) {
+    isLoading.value = value;
   }
 }

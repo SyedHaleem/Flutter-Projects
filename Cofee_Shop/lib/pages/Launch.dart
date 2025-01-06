@@ -1,4 +1,5 @@
-import 'package:cofee_shop/pages/Login.dart';
+import 'package:cofee_shop/config/Colors.dart';
+import 'package:cofee_shop/firebase_Services/FirebaseServices.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -10,6 +11,9 @@ class Launch extends StatelessWidget {
     // Getting screen dimensions
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
+
+    // Initialize the LaunchController
+    final controller = Get.put(LaunchController());
 
     return Scaffold(
       body: Container(
@@ -53,13 +57,14 @@ class Launch extends StatelessWidget {
               width: screenWidth * 0.8,
               height: screenHeight * 0.08,
               margin: EdgeInsets.only(bottom: screenHeight * 0.1),
-              child: ElevatedButton(
-                onPressed: () {
-                  Get.to(
-                    const Login(),
-                    transition: Transition.downToUp,
-                    duration: const Duration(seconds: 1),
-                  );
+              child: Obx(() => ElevatedButton(
+                onPressed: () async {
+                  controller.toggleLoading(true);
+                  try {
+                    await FirebaseServices().isLogin();
+                  } finally {
+                    controller.toggleLoading(false);
+                  }
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.white,
@@ -67,7 +72,12 @@ class Launch extends StatelessWidget {
                     borderRadius: BorderRadius.circular(15),
                   ),
                 ),
-                child: const Text(
+                child: controller.isLoading.value
+                    ? const CircularProgressIndicator(
+                  strokeWidth: 3,
+                  color: CofeeBox,
+                )
+                    : const Text(
                   'Get Started',
                   style: TextStyle(
                     fontSize: 24,
@@ -76,11 +86,19 @@ class Launch extends StatelessWidget {
                     fontFamily: 'Inter',
                   ),
                 ),
-              ),
+              )),
             ),
           ],
         ),
       ),
     );
+  }
+}
+
+class LaunchController extends GetxController {
+  var isLoading = false.obs;
+
+  void toggleLoading(bool value) {
+    isLoading.value = value;
   }
 }

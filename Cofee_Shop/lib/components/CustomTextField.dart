@@ -11,6 +11,7 @@ class CustomTextField extends StatelessWidget {
   final Color iconColor;
   final double width;
   final bool? isSearched;
+  final String? Function(String?)? validator; // Validation function
 
   const CustomTextField({
     super.key,
@@ -24,6 +25,7 @@ class CustomTextField extends StatelessWidget {
     required this.iconColor,
     required this.width,
     this.isSearched = false,
+    this.validator, // Validator added
   });
 
   @override
@@ -36,6 +38,7 @@ class CustomTextField extends StatelessWidget {
         obscureText: obscureText,
         keyboardType: keyboardType,
         style: TextStyle(color: textColor),
+        // validator: validator, // Hook validator here
         decoration: InputDecoration(
           filled: true,
           fillColor: bgColor,

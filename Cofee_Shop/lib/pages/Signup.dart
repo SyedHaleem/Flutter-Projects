@@ -1,13 +1,19 @@
 import 'package:cofee_shop/components/CustomTextField.dart';
 import 'package:cofee_shop/pages/Home.dart';
+import 'package:cofee_shop/utils/utils.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
+import '../config/Colors.dart';
 
 class Signup extends StatelessWidget {
   const Signup({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final FirebaseAuth _auth = FirebaseAuth.instance;
+    final RegistrationController regController = Get.put(RegistrationController());
     TextEditingController uName = TextEditingController();
     TextEditingController uPass = TextEditingController();
     TextEditingController uEmail = TextEditingController();
@@ -95,29 +101,56 @@ class Signup extends StatelessWidget {
                       ),
                       SizedBox(height: screenHeight * 0.08), // Responsive gap
                       Container(
-                        width: buttonWidth, // Responsive button width
-                        height: 64, // Fixed height for consistency
-                        child: ElevatedButton(
-                          onPressed: () {
-                            Get.to(const Home());
-                          },
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 15),
-                            backgroundColor: Colors.white70,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15),
+                        width: buttonWidth,
+                        height: 64,
+                        child: Obx(() {
+                          return ElevatedButton(
+                            onPressed: regController.isLoading.value
+                                ? null
+                                : () {
+                                regController.toggleLoading(true);
+                                _auth
+                                    .createUserWithEmailAndPassword(
+                                  email: uEmail.text.trim(),
+                                  password: uPass.text.trim(),
+                                )
+                                    .then((value) {
+                                  // Show success message
+                                  Utils().toastMessage("Registration successful!");
+
+                                  // Stop loading
+                                  regController.toggleLoading(false);
+                                })
+                                    .onError((error, stackTrace) {
+                                  // Show error message
+                                  Utils().toastMessage(error.toString());
+                                  // Stop loading
+                                  regController.toggleLoading(false);
+                                });
+                            },
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 15),
+                              backgroundColor: Colors.white70,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15),
+                              ),
                             ),
-                          ),
-                          child: Text(
-                            'Signup',
-                            style: TextStyle(
-                              fontSize: fontSize, // Responsive font size
-                              color: Colors.black,
-                              fontFamily: 'Inter',
-                              fontWeight: FontWeight.w500,
+                            child: regController.isLoading.value
+                                ? const CircularProgressIndicator(
+                              strokeWidth: 3,
+                              color: CofeeBox,
+                            )
+                                : const Text(
+                              'Signup',
+                              style: TextStyle(
+                                fontSize: 20,
+                                color: Colors.black,
+                                fontFamily: 'Inter',
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
-                          ),
-                        ),
+                          );
+                        }),
                       ),
                       SizedBox(height: screenHeight * 0.07), // Responsive gap
                     ],
@@ -129,5 +162,13 @@ class Signup extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+class RegistrationController extends GetxController {
+  var isLoading = false.obs;
+
+  void toggleLoading(bool value) {
+    isLoading.value = value;
   }
 }
