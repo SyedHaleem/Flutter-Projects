@@ -12,6 +12,9 @@
       <excludeFolder url="file://$MODULE_DIR$/MusicApp/.dart_tool" />
       <excludeFolder url="file://$MODULE_DIR$/MusicApp/.pub" />
       <excludeFolder url="file://$MODULE_DIR$/MusicApp/build" />
+      <excludeFolder url="file://$MODULE_DIR$/musicapp/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/musicapp/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/musicapp/build" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
