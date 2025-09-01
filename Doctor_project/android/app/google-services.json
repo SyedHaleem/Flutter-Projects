@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "97774945157",
+    "project_id": "syedmuhammadproject",
+    "storage_bucket": "syedmuhammadproject.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:97774945157:android:abda9d84d442a0e3af3aec",
+        "android_client_info": {
+          "package_name": "com.example.doctor_project"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCIsMMiZM6YjvqlcTFh9UDNC8HnK82Eozs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
