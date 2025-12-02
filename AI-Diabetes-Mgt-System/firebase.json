@@ -1,0 +1,41 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "diabetes-app-d7718",
+          "appId": "1:433770674222:android:094a5ff93a941a4b7c47bf",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "diabetes-app-d7718",
+          "configurations": {
+            "android": "1:433770674222:android:094a5ff93a941a4b7c47bf",
+            "ios": "1:433770674222:ios:c52c9c5234a647027c47bf",
+            "macos": "1:433770674222:ios:c52c9c5234a647027c47bf",
+            "web": "1:433770674222:web:16c6479d439eda377c47bf",
+            "windows": "1:433770674222:web:1d19d1f3be8d65567c47bf"
+          }
+        }
+      }
+    }
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "*.local"
+      ],
+      "predeploy": [
+        "npm --prefix \"$RESOURCE_DIR\" run build"
+      ]
+    }
+  ]
+}
